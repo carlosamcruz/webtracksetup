@@ -1,0 +1,63 @@
+Instruções para Configurar o Projeto:
+
+	npx create-react-app@latest webstrack --template typescript
+	cd webstrack
+	npx scrypt-cli@latest init
+
+		***Se precisar aplicar os seguintes comandos e repetir:
+
+		git init
+		git add .
+		git commit -m "Initialize project using Creat React App"
+
+		npx scrypt-cli@latest init
+
+Usar os Folders da pasta crack_scrypt_0.1.73
+
+Deletar folders
+	..\node_modules\bsv
+	..\node_modules\scrypt-ts
+
+Substituir folders da pasta crack versão atual, para dentro de node_modules
+	bsv
+	scrypt-ts
+
+Substituir a pasta	
+	src pela pasta atual webtrack
+	npx scrypt-cli@latest compile
+	npm start
+
+*********************************************************
+*********************************************************
+
+Se der problema, "Process not found":
+
+1 - Solução Principal
+
+Deletar pasta:
+	..\node_modules\.cache
+	..\node_modules\node-polyfill-webpack-plugin
+
+Copiar de Crack as Pastas:
+	node-polyfill-webpack-plugin
+	filter-obj
+
+E colar em node_modules:
+
+	..\node_modules\node-polyfill-webpack-plugin
+	..\node_modules\filter-obj
+
+2 - Solução que pode ser aplicada antes da primeira
+
+Instalar:
+
+	npm install process
+	npm install webpack webpack-cli --save-dev
+
+Deletar pasta:
+	..\node_modules\.cache
+
+Rodar:
+	npm start
+
+Se o problema persistir, aplicar solução 1;	
