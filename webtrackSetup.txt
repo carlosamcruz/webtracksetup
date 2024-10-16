@@ -15,10 +15,10 @@ Instruções para Configurar o Projeto:
 Usar os Folders da pasta crack_scrypt_0.1.73
 
 Deletar folders
-	..\node_modules\bsv
+	..\node_modules\@scrypt-inc\bsv
 	..\node_modules\scrypt-ts
 
-Substituir folders da pasta crack versão atual, para dentro de node_modules
+Substituir folders da pasta crack versão atual, para dentro de "node_modules\@scrypt-inc" e "node_modules"
 	bsv
 	scrypt-ts
 
