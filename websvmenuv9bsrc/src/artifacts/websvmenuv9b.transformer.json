@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "websvmenuv9b.scrypt",
+  "sourceMapFile": "websvmenuv9b.scrypt.map",
+  "ctxMethods": [
+    "increment"
+  ]
+}

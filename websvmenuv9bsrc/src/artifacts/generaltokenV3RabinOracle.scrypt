@@ -1,0 +1,183 @@
+import "../node_modules/scrypt-ts-lib/artifacts/rabinSignature.scrypt";
+struct __scrypt_ts_Change {  int amount;  Ripemd160 address;}
+
+contract GeneralTokenV3RabinOracle {
+  const bytes tokenType;
+  const int totalSupply;
+  const bytes idData;
+  const int oraclePubKey;
+  @state Ripemd160 alice;
+  @state bytes data;
+  @state bool sell;
+  @state int price;
+  @state int thisSupply;
+  @state Ripemd160 toBuyer;
+  @state bytes genesisTX;
+  bytes __scrypt_ts_ctx_hashprevouts;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_value;
+  __scrypt_ts_Change __scrypt_ts_change;
+  bytes __scrypt_ts_prevouts;
+  constructor(Ripemd160 alice, int totalSupply, bytes idData, int oraclePubKey) {
+    this.totalSupply = totalSupply;
+    this.idData = idData;
+    this.thisSupply = this.totalSupply;
+    this.alice = alice;
+    this.data = b'';
+    this.sell = false;
+    this.price = 0;
+    this.toBuyer = this.alice;
+    this.genesisTX = b'';
+    this.tokenType = b'47656e6572616c20507572706f736520546f6b656e20526162696e204f7261636c65';
+    this.oraclePubKey = oraclePubKey;
+  }
+  public function setupToken(RabinSig CertSig, Sig sig, PubKey pubkey, bool finish, bytes newData, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_prevouts) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashprevouts = SigHash.hashPrevouts(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(hash256(__scrypt_ts_prevouts) == this.__scrypt_ts_ctx_hashprevouts);
+    this.__scrypt_ts_prevouts = __scrypt_ts_prevouts;
+    require(hash160(pubkey) == this.alice);
+    require(checkSig(sig, pubkey));
+    bytes outputs = b'';
+    if(finish) {
+        outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.alice), this.__scrypt_ts_ctx_value);
+      } else {
+        if(this.genesisTX == b'') {
+          this.genesisTX = reverseBytes(this.__scrypt_ts_prevouts[0 : 32], 32) + this.tokenType;
+          
+        }
+        require(RabinVerifier.verifySig(this.__scrypt_ts_prevouts[0 : 36], CertSig, this.oraclePubKey));
+        
+        this.data = newData;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+        
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function sellOrder(RabinSig CertSig, Sig sig, PubKey pubkey, bool sell, int price, Ripemd160 toBuyer, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_prevouts) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashprevouts = SigHash.hashPrevouts(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(hash256(__scrypt_ts_prevouts) == this.__scrypt_ts_ctx_hashprevouts);
+    this.__scrypt_ts_prevouts = __scrypt_ts_prevouts;
+    require(hash160(pubkey) == this.alice);
+    require(checkSig(sig, pubkey));
+    require((this.sell || sell) && !(this.sell && sell));
+    if(this.genesisTX == b'') {
+        this.genesisTX = reverseBytes(this.__scrypt_ts_prevouts[0 : 32], 32) + this.tokenType;
+        
+      }
+    require(RabinVerifier.verifySig(this.__scrypt_ts_prevouts[0 : 36], CertSig, this.oraclePubKey));
+    this.sell = sell;
+    if(sell) {
+        this.price = price;
+        this.toBuyer = toBuyer;
+      } else {
+        this.price = 0;
+        this.toBuyer = this.alice;
+      }
+    bytes outputs = b'';
+    outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+    if(this.toBuyer != this.alice) {
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.toBuyer), 1);
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function buying(RabinSig CertSig, Ripemd160 newOwner, int price, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_prevouts) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashprevouts = SigHash.hashPrevouts(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(hash256(__scrypt_ts_prevouts) == this.__scrypt_ts_ctx_hashprevouts);
+    this.__scrypt_ts_prevouts = __scrypt_ts_prevouts;
+    require(this.sell);
+    require(price >= this.price);
+    if(this.toBuyer != this.alice) {
+        require(this.toBuyer == newOwner);
+      }
+    require(newOwner != this.alice);
+    require(RabinVerifier.verifySig(this.__scrypt_ts_prevouts[0 : 36], CertSig, this.oraclePubKey));
+    bytes outputs = b'';
+    if(this.sell) {
+        Ripemd160 lastAlice = this.alice;
+        this.alice = newOwner;
+        this.sell = false;
+        this.price = 0;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(lastAlice), price);
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function split(RabinSig CertSig, Sig sig, PubKey pubkey, int numberOfSendTokens, Ripemd160 toNewOwner, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_prevouts) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashprevouts = SigHash.hashPrevouts(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(hash256(__scrypt_ts_prevouts) == this.__scrypt_ts_ctx_hashprevouts);
+    this.__scrypt_ts_prevouts = __scrypt_ts_prevouts;
+    require(numberOfSendTokens <= this.thisSupply);
+    require(hash160(pubkey) == this.alice);
+    require(checkSig(sig, pubkey));
+    if(this.genesisTX == b'') {
+        this.genesisTX = reverseBytes(this.__scrypt_ts_prevouts[0 : 32], 32) + this.tokenType;
+        
+      }
+    require(RabinVerifier.verifySig(this.__scrypt_ts_prevouts[0 : 36], CertSig, this.oraclePubKey));
+    bytes outputs1 = b'';
+    bytes outputs = b'';
+    if(this.thisSupply == numberOfSendTokens) {
+        this.alice = toNewOwner;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.alice), 1);
+      } else {
+        this.thisSupply = this.thisSupply - numberOfSendTokens;
+        outputs1 = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+        this.alice = toNewOwner;
+        this.thisSupply = numberOfSendTokens;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value) + outputs1;
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.alice), 1);
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function mergeTokens(RabinSig CertSig, Sig sig, PubKey pubkey, int Supply1, int Supply2, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_prevouts) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashprevouts = SigHash.hashPrevouts(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(hash256(__scrypt_ts_prevouts) == this.__scrypt_ts_ctx_hashprevouts);
+    this.__scrypt_ts_prevouts = __scrypt_ts_prevouts;
+    require(hash160(pubkey) == this.alice);
+    require(checkSig(sig, pubkey));
+    require(RabinVerifier.verifySig(this.__scrypt_ts_prevouts[0 : 72], CertSig, this.oraclePubKey));
+    bytes outputs = b'';
+    this.thisSupply = Supply1 + Supply2;
+    outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+    outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.alice), this.__scrypt_ts_ctx_value);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+  function buildChangeOutput() : bytes {  return this.__scrypt_ts_change.amount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(this.__scrypt_ts_change.address), this.__scrypt_ts_change.amount) : b'';}
+}

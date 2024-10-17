@@ -1,0 +1,36 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.4+commit.cfee948",
+    "contract": "Helloworld02",
+    "md5": "30792d4b4450718993a04bd7275accf2",
+    "structs": [],
+    "library": [],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": [
+                {
+                    "name": "message",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "type": "constructor",
+            "params": [
+                {
+                    "name": "hash",
+                    "type": "Sha256"
+                }
+            ]
+        }
+    ],
+    "stateProps": [],
+    "buildType": "debug",
+    "file": "..\\helloworld02.scrypt",
+    "hex": "<hash>78a878877777",
+    "sourceMapFile": ""
+}

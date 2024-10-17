@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "stateful.scrypt",
+  "sourceMapFile": "stateful.scrypt.map",
+  "ctxMethods": [
+    "incrementOnChain",
+    "decrementOnChain"
+  ]
+}

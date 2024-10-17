@@ -1,0 +1,26 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.4+commit.cfee948",
+    "contract": "ErrorSC",
+    "md5": "e97fd94a484fcd14987f2f577d9aa0f2",
+    "structs": [],
+    "library": [],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": []
+        },
+        {
+            "type": "constructor",
+            "params": []
+        }
+    ],
+    "stateProps": [],
+    "buildType": "debug",
+    "file": "..\\errorSC.scrypt",
+    "hex": "0002010177020101788777",
+    "sourceMapFile": ""
+}

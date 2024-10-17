@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "generaltokenV2old.scrypt",
+  "sourceMapFile": "generaltokenV2old.scrypt.map",
+  "ctxMethods": [
+    "setupToken",
+    "sellOrder",
+    "buying",
+    "split",
+    "mergeTokens"
+  ]
+}

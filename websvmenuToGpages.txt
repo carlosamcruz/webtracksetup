@@ -1,0 +1,44 @@
+https://carlosamcruz.github.io/websvmenu/
+
+1. Instale o pacote gh-pages:
+Abra o terminal no diretório do seu projeto e execute o seguinte comando para instalar o pacote gh-pages como uma dependência de desenvolvimento:
+
+bash
+Copiar código
+npm install gh-pages --save-dev
+2. Configure o package.json:
+Adicione os scripts necessários para o deploy no seu arquivo package.json. Na seção "scripts", adicione os seguintes scripts:
+
+json
+Copiar código
+"scripts": {
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build"
+}
+O script predeploy irá garantir que seu projeto seja construído antes do deploy, e o script deploy publicará a pasta build no GitHub Pages.
+
+3. Adicione o repositório:
+Ainda no package.json, adicione a URL do seu repositório GitHub. Inclua algo assim:
+
+json
+Copiar código
+"homepage": "https://<username>.github.io/<repository-name>"
+Substitua <username> pelo seu nome de usuário do GitHub e <repository-name> pelo nome do seu repositório.
+
+4. Deploy:
+Agora, para fazer o deploy, execute o comando abaixo no terminal:
+
+bash
+Copiar código
+npm run deploy
+Isso deve gerar o build do seu projeto e publicá-lo no GitHub Pages.
+
+
+
+
+# websvmenu
+menu of some bitcoin web functions
+
+access the didactic menu @
+
+https://carlosamcruz.github.io/websvmenu/

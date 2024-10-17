@@ -1,0 +1,10 @@
+
+contract ErrorSC {
+  bytes msgError;
+  constructor() {
+    this.msgError = b'0101';
+  }
+  public function unlock() {
+    require(b'0101' == this.msgError);
+  }
+}

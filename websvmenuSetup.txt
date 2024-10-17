@@ -1,0 +1,70 @@
+Instruções para Configurar o Projeto:
+
+	npx create-react-app websvmenuvXX --template typescript
+	cd websvmenuvXX
+	npx scrypt-cli@latest init
+
+		***Se precisar aplicar os seguintes comandos e repetir:
+
+		git init
+		git add .
+		git commit -m "Initialize project using Creat React App"
+
+		npx scrypt-cli@latest init
+
+Instalar (Contratos que utilizam Rabin Signature):
+	npm install scrypt-ts-lib		//https://github.com/sCrypt-Inc/scrypt-ts-lib
+
+Instalar gpages:
+
+	npm install gh-pages --save-dev
+
+	Pode ou não ser feito antes:
+
+	**npx scrypt-cli@latest compile
+	**npm start
+
+Copiar a pasta crack_scrypt_X.Y.ZZ para dentro da pasta de projeto atual:
+	..\websvmenuvXX\crack_scrypt_0.1.73
+
+Substituir folders da pasta crack versão atual
+	node_modules\@scrypt-inc\bsv
+	node_modules\scrypt-ts
+
+Substituir a pasta
+	
+	src pela pasta atual websvmneu
+	npx scrypt-cli@latest compile
+	npm start
+
+Se der problema, "Process not found":
+
+1 - Solução Principal
+
+Deletar pasta:
+	..\node_modules\.cache
+	..\node_modules\node-polyfill-webpack-plugin
+
+Copiar de Crack as Pastas:
+	node-polyfill-webpack-plugin
+	filter-obj
+
+E colar em node_modules:
+
+	..\node_modules\node-polyfill-webpack-plugin
+	..\node_modules\filter-obj
+
+2 - Solução que pode ser aplicada antes da primeira
+
+Instalar:
+
+	npm install process
+	npm install webpack webpack-cli --save-dev
+
+Deletar pasta:
+	..\node_modules\.cache
+
+Rodar:
+	npm start
+
+Se o problema persistir, aplicar solução 1;	
