@@ -8,9 +8,7 @@ import { broadcast, listUnspent, getTransaction, chainInfoWoC } from './mProvide
 
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
 
-import {homepvtKey, homenetwork, compState, utxoFeeAdd1, feeService} from './Home';
-
-import { dataFormatScryptSC, convertBinaryToHexString, stringToHex, scriptUxtoSize, hexToLittleEndian } from "./myUtils";
+import {homepvtKey, homenetwork, compState} from './Home';
 
 //const provider = new DefaultProvider({network: homenetwork});
 let signer: TestWallet;
@@ -34,7 +32,7 @@ const PageSC03OddOrEvenAccept: FC<props1> = (props) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [txid, setTXID] = useState("");
     
-  const [waitAlert, setwaitAlert] = useState("Inform Text of File then Press Set Data");
+  const [waitAlert, setwaitAlert] = useState("Inform Contract TXID and Press Accept");
 
 
   const [txb, settxb] = useState(true);
@@ -150,7 +148,7 @@ const PageSC03OddOrEvenAccept: FC<props1> = (props) => {
     {
       alert("Missing Data");
       setsendButton(true)
-      setwaitAlert("Inform Text of File then Press Set Data")
+      setwaitAlert("Inform Contract TXID and Press Accept")
     }
     
     else

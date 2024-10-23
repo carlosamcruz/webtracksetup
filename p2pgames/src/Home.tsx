@@ -11,13 +11,6 @@ import { convertBinaryToHexString , myUTXOData, setMyUTXOsData} from './myUtils'
 export let homepvtKey: string = "";
 export let homenetwork = bsv.Networks.testnet;
 export let compState = true;
-//export let utxoFeeFlag =  false;
-export let utxoFeeAdd0 = 'mr78fqdmEP2QEjmgzBrUTWjADySYZektJ6'; //Excusivo para Order Lock
-export let utxoFeeAdd1 = 'mtr5aPABYR7LFKSn18jxWU4hF2pWLU8nVR';
-export let feeService = 1;//1000;
-
-
-
 
 //const provider = new DefaultProvider({network: homenetwork});
 let signer: TestWallet;
@@ -198,24 +191,12 @@ const Home: FC<props1> = (props) => {
     {
       homenetwork = bsv.Networks.mainnet;
 
-      //utxoFeeAdd0 = 'mr78fqdmEP2QEjmgzBrUTWjADySYZektJ6'; //Excusivo para Order Lock
-      utxoFeeAdd0 = '1BbBNnYnRMb9TdJ5Gct6dbWqMyqqdgtELq'; //Excusivo para Order Lock
-      //utxoFeeAdd1 = 'mtr5aPABYR7LFKSn18jxWU4hF2pWLU8nVR';
-      utxoFeeAdd1 = '1EL8HL5CjPg5UCyAHZmagYrNP3DoPxHkXS';
-
-
       setnet("MainNet");
       //insertPVT(0);      
     }
     else
     {
       homenetwork = bsv.Networks.testnet;
-
-      utxoFeeAdd0 = 'mr78fqdmEP2QEjmgzBrUTWjADySYZektJ6'; //Excusivo para Order Lock
-      //utxoFeeAdd0 = '1BbBNnYnRMb9TdJ5Gct6dbWqMyqqdgtELq'; //Excusivo para Order Lock
-      utxoFeeAdd1 = 'mtr5aPABYR7LFKSn18jxWU4hF2pWLU8nVR';
-      //utxoFeeAdd1 = '1EL8HL5CjPg5UCyAHZmagYrNP3DoPxHkXS';
-
 
       setnet("TestNet");
       //insertPVT(0);
@@ -281,20 +262,6 @@ const Home: FC<props1> = (props) => {
 
     
           try {
-
-            //await signer.connect(provider)
-
-            //cont = cont + 1;
-    
-            //pvtkey = "acb";
-            //alert('PVT Key: ' + localPvtKey.current.value)
-            /*
-            await signer.getBalance(bsv.Address.fromPrivateKey(privateKey)).then(balance => {
-              // UTXOs belonging to transactions in the mempool are unconfirmed
-              setbalance(balance.confirmed + balance.unconfirmed)
-            })
-            */
-
 
             const UTXOs = await listUnspent(bsv.Address.fromPrivateKey(privateKey).toString(), homenetwork)
             console.log('Depois de unspent call', UTXOs.length)
@@ -404,19 +371,6 @@ const Home: FC<props1> = (props) => {
 
       try {
 
-/*        //pvtkey = "acb";
-        //alert('PVT Key: ' + localPvtKey.current.value)
-        await signer.getBalance(bsv.Address.fromPrivateKey(privateKey)).then(balance => {
-          // UTXOs belonging to transactions in the mempool are unconfirmed
-          setbalance(balance.confirmed + balance.unconfirmed)
-        })
-
-        setPubkey(bsv.PublicKey.fromPrivateKey(privateKey).toString())
-
-        setaddress(bsv.Address.fromPrivateKey(privateKey).toString())
-*/
-        //console.log('Antes de unspent call', bsv.Address.fromPrivateKey(privateKey).toString())
-        //console.log('Home NW: ', homenetwork)
         const UTXOs = await listUnspent(bsv.Address.fromPrivateKey(privateKey).toString(), homenetwork)
         console.log('Depois de unspent call', UTXOs.length)
 
@@ -508,23 +462,12 @@ const Home: FC<props1> = (props) => {
     {
       homenetwork = bsv.Networks.mainnet;
 
-      //utxoFeeAdd0 = 'mr78fqdmEP2QEjmgzBrUTWjADySYZektJ6'; //Excusivo para Order Lock
-      utxoFeeAdd0 = '1BbBNnYnRMb9TdJ5Gct6dbWqMyqqdgtELq'; //Excusivo para Order Lock
-      //utxoFeeAdd1 = 'mtr5aPABYR7LFKSn18jxWU4hF2pWLU8nVR';
-      utxoFeeAdd1 = '1EL8HL5CjPg5UCyAHZmagYrNP3DoPxHkXS';
-
       setnet("MainNet");
       //insertPVT(0);      
     }
     else
     {
       homenetwork = bsv.Networks.testnet;
-
-      utxoFeeAdd0 = 'mr78fqdmEP2QEjmgzBrUTWjADySYZektJ6'; //Excusivo para Order Lock
-      //utxoFeeAdd0 = '1BbBNnYnRMb9TdJ5Gct6dbWqMyqqdgtELq'; //Excusivo para Order Lock
-      utxoFeeAdd1 = 'mtr5aPABYR7LFKSn18jxWU4hF2pWLU8nVR';
-      //utxoFeeAdd1 = '1EL8HL5CjPg5UCyAHZmagYrNP3DoPxHkXS';
-
 
       setnet("TestNet");
       //insertPVT(0);
@@ -854,14 +797,6 @@ const Home: FC<props1> = (props) => {
              </label>
                     
         </div>        
-
-        {/*
-        <a href='https://medium.com/@cktcracker/access-console-4489593b83e3' target="_blank" rel="noopener noreferrer"
-        style={{ fontSize: '14px', paddingBottom: '5px', color: 'yellow' }}>
-            Instructions of Use
-        </a>
-
-        */}
 
         {
           setaddress.length > 10?

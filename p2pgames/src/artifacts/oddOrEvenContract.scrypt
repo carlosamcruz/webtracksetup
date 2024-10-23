@@ -36,7 +36,6 @@ contract OddOrEvenContract {
     this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
     this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
     require(this.optionP2 == -1);
-    
     require(hash160(pubkey) == this.player1Add);
     require(checkSig(sig, pubkey));
     int contractAmount = (this.__scrypt_ts_ctx_value * 99) / 100;

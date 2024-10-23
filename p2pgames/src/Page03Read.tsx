@@ -10,17 +10,9 @@ import './App.css';
 import {homepvtKey, homenetwork, compState} from './Home';
 import { broadcast, getSpentOutput, getTransaction, listUnspent, scriptHistory, exchangeRate } from './mProviders';
 
-import { ContentType, RetContentType } from './OrdinalsContentType';
-//import { GeneralToken } from "./contracts/generaltoken";
-
-//import { GeneralTokenV2 } from "./contracts/generaltokenV2";
-
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
 
-
 import { mPlaceTokenTemplate, erroSC, hexToLittleEndian, scriptUxtoSize, convertBinaryToHexString } from "./myUtils";
-
-
 
 import { fileTypeFromData, hexToBytes} from "./myUtils";
 
@@ -33,39 +25,19 @@ interface props1 {
 //const Page03Read: FC = () => {
 const Page03Read: FC<props1> = (props) => {
 
-  //const [pubkey, setPubkey] = useState("");
-  const [address, setaddress] = useState("");
-  const [balance, setbalance] = useState(0);
-  const labelRef = useRef<HTMLLabelElement | null>(null);
-  const labelRef02 = useRef<HTMLLabelElement | null>(null);
-  const labelRef03 = useRef<HTMLLabelElement | null>(null);
-
-  //let txlink = useRef<HTMLLabelElement | null>(null);
-
   //const [linkUrl, setLinkUrl] = useState('https://whatsonchain.com/');
   const [linkUrl, setLinkUrl] = useState("");
   const [txid, setTXID] = useState("");
   const [currentTxid, setcurrentTxid] = useState("");
 
-
   const [fileType, setfileType] = useState("bin");
-
   const [txStamp, settxStamp] = useState("");
 
-
-
   const [downloadFile, setdownloadFile] = useState(false);
-  const [downloadTX, setdownloadTX] = useState(false);
-  
-  
-
 
   const [waitAlert, setwaitAlert] = useState("Inform the TXID to Start");
 
-
-
   const [txb, settxb] = useState(true);
-
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [binaryData, setbinaryData] = useState<Uint8Array>(new Uint8Array());

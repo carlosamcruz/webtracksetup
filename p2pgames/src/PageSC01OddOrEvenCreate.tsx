@@ -1,12 +1,10 @@
 import React, { useRef, FC, useState} from 'react';
 
-import logo from './logo.svg';
 import './App.css';
 
 import { DefaultProvider, sha256, toHex, PubKey, bsv, TestWallet, Tx, toByteString, PubKeyHash, hash160, int2ByteString } from "scrypt-ts";
 
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
-import { dataFormatScryptSC, stringToHex} from "./myUtils";
 
 import {homepvtKey, homenetwork, compState} from './Home';
 import { chainInfoWoC } from './mProviders';
@@ -17,8 +15,6 @@ let Alice: TestWallet
 let signerExt: TestWallet
 
 function PageSC01OddOrEvenCreate() {
-//const  deployACT: FC = () => {  
-
 
   const [deployedtxid, setdeptxid] = useState("");
   const labelRef = useRef<HTMLLabelElement | null>(null);

@@ -31,18 +31,6 @@ const Page01TX: FC = () => {
 
   const [sendButton, setsendButton] = useState(true);
 
-  const handleCopyClick = () => {
-    if (labelRef.current) {
-      navigator.clipboard.writeText(labelRef.current.innerText)
-        .then(() => {
-          alert('Copied to clipboard!');
-        })
-        .catch((error) => {
-          console.error('Failed to copy to clipboard:', error);
-        });
-    }
-  };
-
   let addToSend = useRef<any>(null);
   let satsAmount = useRef<any>(null);
   let messageOpt = useRef<any>(null);
@@ -86,23 +74,6 @@ const Page01TX: FC = () => {
       console.log("PVT KEY: ", privateKey.compressed)
 
       try {
-
-        //await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for 2 seconds
-        //pvtkey = "acb";
-        //alert('PVT Key: ' + localPvtKey.current.value)
-
-
-        /*
-        await signer.getBalance(bsv.Address.fromPrivateKey(privateKey)).then(balance => {
-          // UTXOs belonging to transactions in the mempool are unconfirmed
-          setbalance(balance.confirmed + balance.unconfirmed)
-
-
-          console.log("Bal: ", balance.confirmed + balance.unconfirmed)
-
-        })
-
-        */
 
         const UTXOs = await listUnspent(bsv.Address.fromPrivateKey(privateKey).toString(), homenetwork)
         console.log('Depois de unspent call', UTXOs.length)
@@ -555,13 +526,6 @@ const Page01TX: FC = () => {
                           </label>
                           <output id="output1"></output>
 
-                          {/*
-                          <label ref={labelRef02} style={{ fontSize: '12px', paddingBottom: '5px' }} 
-                          >
-                            {address}
-
-                          </label>   
-                          */}                
         </div>
 
         <div style={{ textAlign: 'center' , paddingBottom: '20px'}}>
@@ -660,7 +624,7 @@ const Page01TX: FC = () => {
                 </div>
                 <div className="label-container" style={{ fontSize: '14px', paddingBottom: '5px', paddingTop: '0px' }}>
                   <p className="responsive-label" style={{ fontSize: '12px' }}>TX link: {' '} 
-                      <a href={linkUrl} target="_blank" style={{ fontSize: '12px'}}>
+                      <a href={linkUrl} target="_blank" style={{ fontSize: '12px', color: 'cyan'}}>
                       {linkUrl}</a></p>
                 </div>
               </div>

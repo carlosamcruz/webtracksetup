@@ -8,9 +8,7 @@ import { broadcast, listUnspent, getTransaction, chainInfoWoC } from './mProvide
 
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
 
-import {homepvtKey, homenetwork, compState, utxoFeeAdd1, feeService} from './Home';
-
-import { dataFormatScryptSC, convertBinaryToHexString, stringToHex, scriptUxtoSize, hexToLittleEndian } from "./myUtils";
+import {homepvtKey, homenetwork, compState} from './Home';
 
 //const provider = new DefaultProvider({network: homenetwork});
 let signer: TestWallet;
@@ -34,7 +32,7 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [txid, setTXID] = useState("");
     
-  const [waitAlert, setwaitAlert] = useState("Inform Text of File then Press Set Data");
+  const [waitAlert, setwaitAlert] = useState("Inform Contract TXID and Press Result");
 
 
   const [txb, settxb] = useState(true);
@@ -150,7 +148,7 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
     {
       alert("Missing Data");
       setsendButton(true)
-      setwaitAlert("Inform Text of File then Press Set Data")
+      setwaitAlert("Inform Contract TXID and Press Result")
     }
     
     else
@@ -205,37 +203,6 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
 
       await instance2.connect(signer)
 
-      /*
-      let txFee = new bsv.Transaction
-      
-      console.log("Antes: ")
-      let UTXOs: bsv.Transaction.IUnspentOutput[] = []
-
-      UTXOs = await listUnspent(bsv.Address.fromPrivateKey(pvtkey), homenetwork)
-
-
-      //console.log("tx3.UTXOs[0]: ", tx3.Output(0));
-      txFee = new bsv.Transaction (await getTransaction("dd84108e2bc3de2ec605c54dadd7bde2a8f35c8048e8e7e5ae2d5cba99a69c97", homenetwork))
-
-      UTXOs.push(txFee.outputs[0]);
-      UTXOs[UTXOs.length - 1].txId = "dd84108e2bc3de2ec605c54dadd7bde2a8f35c8048e8e7e5ae2d5cba99a69c97";
-
-
-      let utxo: bsv.Transaction.IUnspentOutput = {                                                    
-        height: 10,
-        outputIndex: 0,
-        satoshis: txFee.outputs[0]._satoshis,
-        script: (txFee.outputs[0]._script.buffer.toString('hex')),
-        txId: "dd84108e2bc3de2ec605c54dadd7bde2a8f35c8048e8e7e5ae2d5cba99a69c97"
-        //script: scryptlib_1.bsv.Script.buildPublicKeyHashOut(address).toHex(),
-      };
-      
-      console.log("txFee.UTXOs[0]: ", txFee.outputs[0])
-
-      SmartContract.dummyUTXOon(utxo);
-
-      
-      */
       let fee = 17;
 
       instance2.bindTxBuilder('resultGame', async function () {
@@ -252,9 +219,6 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
         //unsignedTx.setInputSequence(0,1);
 
         let oddness: bigint = instance2.isOddP1? 1n: 0n;
-
-        //let plaformAmount = ((2 * (balance / 3)) * 10) / 100;
-        //let player1Refund = balance / 3;
 
         if(sha256(keyGame.current.value + int2ByteString(optionP1.current.value)) == instance2.hashOptionP1 
             && (BigInt(optionP1.current.value) + instance2.optionP2) % 2n == oddness){
@@ -316,10 +280,6 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
 //////////////////////////////////////////////////////////////
 
       settxb(true);
-         
-      //const txId = await provider.sendRawTransaction(rawTX)
-
-      //const txId = await broadcast(rawTX, homenetwork)
       const txId = callTx.id
 
       if(txId.length === 64)
@@ -384,14 +344,8 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
         Odd or Even Challange - Result
-        {
-         /*
-        Create {props.passedData} Token
-        */
-        }
         
       </h2>
-
 
       <div style={{ textAlign: 'center', paddingBottom: '20px' }}>
                           <label htmlFor="output1"  style={{ fontSize: '12px', paddingBottom: '5px' }}                           

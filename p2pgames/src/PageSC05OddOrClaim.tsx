@@ -8,7 +8,7 @@ import { broadcast, listUnspent, getTransaction, chainInfoWoC } from './mProvide
 
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
 
-import {homepvtKey, homenetwork, compState, utxoFeeAdd1, feeService} from './Home';
+import {homepvtKey, homenetwork, compState} from './Home';
 
 let signer: TestWallet;
 
@@ -28,7 +28,7 @@ const PageSC05OddOrClaim: FC<props1> = (props) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [txid, setTXID] = useState("");
     
-  const [waitAlert, setwaitAlert] = useState("Inform Text of File then Press Set Data");
+  const [waitAlert, setwaitAlert] = useState("Inform Contract TXID and Press Accept");
   const [txb, settxb] = useState(true);
 
   const [sendButton, setsendButton] = useState(true);
@@ -136,7 +136,7 @@ const PageSC05OddOrClaim: FC<props1> = (props) => {
     {
       alert("Missing Data");
       setsendButton(true)
-      setwaitAlert("Inform Text of File then Press Set Data")
+      setwaitAlert("Inform Contract TXID and Press Accept")
     }
     
     else
@@ -329,12 +329,7 @@ const PageSC05OddOrClaim: FC<props1> = (props) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
         Odd or Even Challange - Claim
-        {
-         /*
-        Create {props.passedData} Token
-        */
-        }
-        
+                
       </h2>
 
 

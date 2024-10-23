@@ -8,9 +8,7 @@ import { broadcast, listUnspent, getTransaction, chainInfoWoC } from './mProvide
 
 import { OddOrEvenContract } from "./contracts/oddOrEvenContract";
 
-import {homepvtKey, homenetwork, compState, utxoFeeAdd1, feeService} from './Home';
-
-import { dataFormatScryptSC, convertBinaryToHexString, stringToHex, scriptUxtoSize, hexToLittleEndian } from "./myUtils";
+import {homepvtKey, homenetwork, compState} from './Home';
 
 //const provider = new DefaultProvider({network: homenetwork});
 let signer: TestWallet;
@@ -35,7 +33,7 @@ const PageSC02OddOrEvenQuit: FC<props1> = (props) => {
   const [linkUrl, setLinkUrl] = useState("");
   const [txid, setTXID] = useState("");
  
-  const [waitAlert, setwaitAlert] = useState("Inform Text of File then Press Set Data");
+  const [waitAlert, setwaitAlert] = useState("Inform Contract TXID and Press Quit");
 
   const [txb, settxb] = useState(true);
 
@@ -145,7 +143,7 @@ const PageSC02OddOrEvenQuit: FC<props1> = (props) => {
     {
       alert("Missing Data");
       setsendButton(true)
-      setwaitAlert("Inform Text of File then Press Set Data")
+      setwaitAlert("Inform Contract TXID and Press Quit")
     }
     
     else
@@ -194,34 +192,6 @@ const PageSC02OddOrEvenQuit: FC<props1> = (props) => {
   
       const balance = instance2.balance
       const nextInstance = instance2.next()
-
-      ////////////////////////////////////////////////////////
-      //Para o calculo da Taxa de Serviço
-      ////////////////////////////////////////////////////////
-      let utxoFeeFlag = false;
-
-      if(feeService > 0)
-        utxoFeeFlag = true
-
-      let utxoFee =  new bsv.Transaction().addOutput(new bsv.Transaction.Output({
-        //script: buildPublicKeyHashScript(hash160(instance2.alice)),
-        //script: buildPublicKeyHashScript(instance2.alice),
-        script: buildPublicKeyHashScript(PubKeyHash(toHex(bsv.Address.fromString(utxoFeeAdd1).hashBuffer))),
-        satoshis: feeService
-      }))
-
-      //Tamanho do script formatado
-      let out1size = scriptUxtoSize(utxoFee.outputs[0].script.toHex()) 
-      let tokenSats = (utxoFee.outputs[0].satoshis).toString(16);
-      //console.log("Sat STR 0: ", tokenSats)
-      while(tokenSats.length < 16)
-      {
-        tokenSats = '0' + tokenSats
-      }
-
-     
-      ////////////////////////////////////////////////////////
-      ////////////////////////////////////////////////////////
               
       await instance2.connect(signer)
 
