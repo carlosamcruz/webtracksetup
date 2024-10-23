@@ -1,0 +1,116 @@
+struct __scrypt_ts_Change {  int amount;  Ripemd160 address;}
+
+contract OddOrEvenContract {
+  const int timeout;
+  const int nLockTime;
+  const Ripemd160 player1Add;
+  const Ripemd160 platFormAdd;
+  const bool isOddP1;
+  @state Ripemd160 player2Add;
+  @state int optionP2;
+  @state int timeOutP1;
+  @state int timeOutP2;
+  const bytes hashOptionP1;
+  bytes __scrypt_ts_ctx_hashsequence;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_locktime;
+  int __scrypt_ts_ctx_value;
+  __scrypt_ts_Change __scrypt_ts_change;
+  constructor(Ripemd160 player1Add, bytes hashOptionP1, bool isOdd, Ripemd160 platFormAdd, int nLockTime) {
+    this.player1Add = player1Add;
+    this.player2Add = player1Add;
+    this.platFormAdd = platFormAdd;
+    this.optionP2 = -1;
+    this.isOddP1 = isOdd;
+    this.hashOptionP1 = hashOptionP1;
+    this.nLockTime = nLockTime;
+    this.timeout = (2);
+    this.timeOutP1 = this.nLockTime + this.timeout;
+    this.timeOutP2 = this.timeOutP1;
+  }
+  public function quitGame(Sig sig, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashsequence = SigHash.hashSequence(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.optionP2 == -1);
+    
+    require(hash160(pubkey) == this.player1Add);
+    require(checkSig(sig, pubkey));
+    int contractAmount = (this.__scrypt_ts_ctx_value * 99) / 100;
+    bytes outputs = b'';
+    outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player1Add), contractAmount);
+    outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.platFormAdd), 1 + (this.__scrypt_ts_ctx_value - contractAmount));
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function acceptGame(Sig sig, PubKey pubkey, Ripemd160 player2Add, int optionP2, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashsequence = SigHash.hashSequence(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(optionP2 > -1);
+    require(this.__scrypt_ts_ctx_locktime >= (this.nLockTime));
+    bytes outputs = b'';
+    if(this.__scrypt_ts_ctx_locktime <= this.timeOutP1) {
+        this.optionP2 = optionP2;
+        this.player2Add = player2Add;
+        this.timeOutP2 = this.__scrypt_ts_ctx_locktime + this.timeout;
+        int contractAmount = ((2 * this.__scrypt_ts_ctx_value) * 90) / 100;
+        outputs = this.buildStateOutput(contractAmount);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.platFormAdd), 1 + ((2 * this.__scrypt_ts_ctx_value) - contractAmount));
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player1Add), 1);
+      } else {
+        require(hash160(pubkey) == this.platFormAdd);
+        require(checkSig(sig, pubkey));
+        int contractAmount = (this.__scrypt_ts_ctx_value * 99) / 100;
+        outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player1Add), contractAmount);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.platFormAdd), 1 + (this.__scrypt_ts_ctx_value - contractAmount));
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function resultGame(Sig sig, PubKey pubkey, bytes keygame, int optionP1, Ripemd160 player1AddResult, int fee, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashsequence = SigHash.hashSequence(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    require(this.optionP2 > -1);
+    require(hash160(pubkey) == this.player1Add);
+    require(checkSig(sig, pubkey));
+    int oddness = this.isOddP1 ? 1 : 0;
+    bytes outputs = b'';
+    if(sha256(keygame + pack(optionP1)) == this.hashOptionP1 && (optionP1 + this.optionP2) % 2 == oddness) {
+        outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(player1AddResult), this.__scrypt_ts_ctx_value - fee);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player2Add), 1);
+      } else {
+        outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player2Add), this.__scrypt_ts_ctx_value - fee);
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function claimGame(int fee, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashsequence = SigHash.hashSequence(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    require(this.__scrypt_ts_ctx_hashsequence == hash256(b'00000000'));
+    require(this.optionP2 > -1);
+    require(this.__scrypt_ts_ctx_locktime > this.timeOutP2);
+    bytes outputs = b'';
+    outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player2Add), this.__scrypt_ts_ctx_value - fee);
+    outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.player1Add), 1);
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+  function buildChangeOutput() : bytes {  return this.__scrypt_ts_change.amount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(this.__scrypt_ts_change.address), this.__scrypt_ts_change.amount) : b'';}
+}

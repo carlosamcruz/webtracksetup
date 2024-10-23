@@ -1,0 +1,23 @@
+import { SmartContractLib, Sha256, ByteString } from 'scrypt-ts';
+import { MerkleProof } from './merklePath';
+export type BlockHeader = {
+    version: ByteString;
+    prevBlockHash: Sha256;
+    merkleRoot: Sha256;
+    time: bigint;
+    bits: ByteString;
+    nonce: bigint;
+};
+export declare class Blockchain extends SmartContractLib {
+    static readonly BLOCK_HEIGHT_POS: bigint;
+    static txInBlock(txid: Sha256, bh: BlockHeader, merkleProof: MerkleProof): boolean;
+    static lastTxInBlock(txid: Sha256, bh: BlockHeader, merkleProof: MerkleProof): boolean;
+    static isValidBlockHeader(bh: BlockHeader, blockchainTarget: bigint): boolean;
+    static isCoinbase(tx: ByteString): boolean;
+    static blockHeight(bh: BlockHeader, coinbaseTx: ByteString, merkleProof: MerkleProof): bigint;
+    static readBlockHeight(coinbaseTx: ByteString): bigint;
+    static bits2Target(bits: ByteString): bigint;
+    static serialize(bh: BlockHeader): ByteString;
+    static blockHeaderHash(bh: BlockHeader): Sha256;
+    static blockHeaderHashAsInt(bh: BlockHeader): bigint;
+}

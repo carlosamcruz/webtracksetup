@@ -1,0 +1,14 @@
+import { SmartContractLib, Sha256, FixedArray } from 'scrypt-ts';
+export type Node = {
+    hash: Sha256;
+    pos: bigint;
+};
+export type MerkleProof = FixedArray<Node, 32>;
+export declare class MerklePath extends SmartContractLib {
+    static readonly DEPTH: bigint;
+    static readonly INVALID_NODE: bigint;
+    static readonly LEFT_NODE: bigint;
+    static readonly RIGHT_NODE: bigint;
+    static calcMerkleRoot(leaf: Sha256, merkleProof: MerkleProof): Sha256;
+    static isCoinbase(merkleproof: MerkleProof): boolean;
+}

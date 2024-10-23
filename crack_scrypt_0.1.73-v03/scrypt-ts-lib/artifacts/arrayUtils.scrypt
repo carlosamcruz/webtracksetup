@@ -1,0 +1,9 @@
+
+library ArrayUtils {
+  static function getElemAt(bytes b, int idx) : bytes {
+    return b[((idx) * 2)/2 : ((idx) * 2 + 2)/2];
+  }
+  static function setElemAt(bytes b, int idx, bytes val) : bytes {
+    return b[(0)/2 : ((idx) * 2)/2] + val + b[((idx) * 2 + 2)/2 : len(b)];
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "oddOrEvenContract.scrypt",
+  "sourceMapFile": "oddOrEvenContract.scrypt.map",
+  "ctxMethods": [
+    "quitGame",
+    "acceptGame",
+    "resultGame",
+    "claimGame"
+  ]
+}
