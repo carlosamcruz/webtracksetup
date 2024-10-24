@@ -20,6 +20,7 @@ import {
 export class OddOrEvenContract extends SmartContract {
     
     //https://xiaohuiliu.medium.com/cross-chain-atomic-swaps-f13e874fcaa7
+    @prop() readonly scriptID: ByteString; // script identifier
     @prop() readonly timeout: bigint // Can be a timestamp or block height.
     @prop() readonly nLockTime: bigint // Can be a timestamp or block height.
     @prop() readonly player1Add: PubKeyHash; // Player 1
@@ -69,6 +70,10 @@ export class OddOrEvenContract extends SmartContract {
         this.timeOutP1 = this.nLockTime + this.timeout;
         
         this.timeOutP2 = this.timeOutP1;
+
+        //Odd or Even P2P Contract = 4f6464206f72204576656e2050325020436f6e7472616374
+        this.scriptID = toByteString('4f6464206f72204576656e2050325020436f6e7472616374');
+
     }
 
     /**
@@ -198,8 +203,8 @@ export class OddOrEvenContract extends SmartContract {
      * @param fee
      */
     @method()    
-    public resultGame(sig: Sig, pubkey: PubKey, 
-        keygame: ByteString, optionP1: bigint, player1AddResult: PubKeyHash, fee: bigint) 
+    public resultGame(keygame: ByteString, optionP1: bigint, sig: Sig, pubkey: PubKey, 
+         player1AddResult: PubKeyHash, fee: bigint) 
     {    
         assert(this.optionP2 > -1n, "Cant verify result before player 2 accpetance")
         //somente o jogador 1 pode chamar este método

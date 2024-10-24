@@ -265,9 +265,9 @@ const PageSC04OddOrEvenResult: FC<props1> = (props) => {
       SmartContract.dummyAutoPayFee(false);
 
       const { tx: callTx } = await instance2.methods.resultGame(
-        (sigResps: SignatureResponse[]) => findSig(sigResps, pbkey), PubKey(toHex(pbkey)),
         keyGame.current.value,
         BigInt(optionP1.current.value),
+        (sigResps: SignatureResponse[]) => findSig(sigResps, pbkey), PubKey(toHex(pbkey)),
         PubKeyHash(toHex(bsv.Address.fromPrivateKey(pvtkey).hashBuffer)),
         BigInt(fee)
       )

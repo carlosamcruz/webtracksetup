@@ -1,6 +1,7 @@
 struct __scrypt_ts_Change {  int amount;  Ripemd160 address;}
 
 contract OddOrEvenContract {
+  const bytes scriptID;
   const int timeout;
   const int nLockTime;
   const Ripemd160 player1Add;
@@ -27,6 +28,7 @@ contract OddOrEvenContract {
     this.timeout = (2);
     this.timeOutP1 = this.nLockTime + this.timeout;
     this.timeOutP2 = this.timeOutP1;
+    this.scriptID = b'4f6464206f72204576656e2050325020436f6e7472616374';
   }
   public function quitGame(Sig sig, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
@@ -77,7 +79,7 @@ contract OddOrEvenContract {
       }
     require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
   }
-  public function resultGame(Sig sig, PubKey pubkey, bytes keygame, int optionP1, Ripemd160 player1AddResult, int fee, SigHashPreimage __scrypt_ts_txPreimage) {
+  public function resultGame(bytes keygame, int optionP1, Sig sig, PubKey pubkey, Ripemd160 player1AddResult, int fee, SigHashPreimage __scrypt_ts_txPreimage) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
     this.__scrypt_ts_ctx_hashsequence = SigHash.hashSequence(__scrypt_ts_txPreimage);
     this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
