@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "mTimeBuyCovenant.scrypt",
+  "sourceMapFile": "mTimeBuyCovenant.scrypt.map",
+  "ctxMethods": [
+    "finish",
+    "priceAtSetTime",
+    "execute",
+    "sellOrder",
+    "buying"
+  ]
+}

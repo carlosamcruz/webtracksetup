@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "mPlaceToken.scrypt",
+  "sourceMapFile": "mPlaceToken.scrypt.map",
+  "ctxMethods": [
+    "finish",
+    "sellOrder",
+    "buying"
+  ]
+}

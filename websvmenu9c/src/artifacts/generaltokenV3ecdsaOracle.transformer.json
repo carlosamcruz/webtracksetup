@@ -1,0 +1,13 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "generaltokenV3ecdsaOracle.scrypt",
+  "sourceMapFile": "generaltokenV3ecdsaOracle.scrypt.map",
+  "ctxMethods": [
+    "setupToken",
+    "sellOrder",
+    "buying",
+    "split",
+    "mergeTokens"
+  ]
+}

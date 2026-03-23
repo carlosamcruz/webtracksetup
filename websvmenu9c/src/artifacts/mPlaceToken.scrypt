@@ -1,0 +1,94 @@
+struct __scrypt_ts_Change {  int amount;  Ripemd160 address;}
+
+contract MarketPlaceToken {
+  @state PubKey alice;
+  @state bytes tokenSats;
+  @state bytes tokenScriptSize;
+  @state bytes tokenP2pkhScript;
+  @state bytes tokenData;
+  @state bool sell;
+  @state int price;
+  @state bytes toBuyerP2PKHScript;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_value;
+  __scrypt_ts_Change __scrypt_ts_change;
+  constructor(PubKey alice) {
+    this.alice = alice;
+    this.tokenSats = b'';
+    this.tokenScriptSize = b'';
+    this.tokenP2pkhScript = b'';
+    this.tokenData = b'';
+    this.sell = false;
+    this.price = 0;
+    this.toBuyerP2PKHScript = b'';
+  }
+  public function finish(Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(checkSig(sig, this.alice));
+    require(this.sell != false);
+    bytes outputs = b'';
+    outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(hash160(this.alice)), this.__scrypt_ts_ctx_value);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function sellOrder(Sig sig, PubKey seller, bool sell, int price, bytes toBuyerP2PKHScript, bytes outSats, bytes outOutScriptSize, bytes outP2pkHScript, bytes outData, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require((this.sell || sell) && !(this.sell && sell));
+    if(sell) {
+        this.alice = seller;
+        require(checkSig(sig, this.alice));
+      } else {
+        require(checkSig(sig, this.alice));
+      }
+    bytes outputs = b'';
+    this.sell = sell;
+    if(sell) {
+        this.price = price;
+        this.toBuyerP2PKHScript = toBuyerP2PKHScript;
+        this.tokenSats = outSats;
+        this.tokenScriptSize = outOutScriptSize;
+        this.tokenP2pkhScript = outP2pkHScript;
+        this.tokenData = outData;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+      } else {
+        this.price = 0;
+        outputs = this.tokenSats + this.tokenScriptSize + this.tokenP2pkhScript + this.tokenData;
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function buying(bytes newOwnerAddScript, int price, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.sell);
+    require(price >= this.price);
+    require(newOwnerAddScript != this.tokenP2pkhScript);
+    if(this.toBuyerP2PKHScript != b'') {
+        require(newOwnerAddScript == this.toBuyerP2PKHScript);
+      }
+    bytes outputs = b'';
+    PubKey lastAlice = this.alice;
+    this.sell = false;
+    this.price = 0;
+    outputs = this.tokenSats + this.tokenScriptSize + newOwnerAddScript + this.tokenData;
+    outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(hash160(lastAlice)), price);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+  function buildChangeOutput() : bytes {  return this.__scrypt_ts_change.amount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(this.__scrypt_ts_change.address), this.__scrypt_ts_change.amount) : b'';}
+}

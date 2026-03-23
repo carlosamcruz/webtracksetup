@@ -1,0 +1,179 @@
+
+struct ExchangeRate {
+  int timestamp;
+  int price;
+  bytes symbol;
+}
+struct __scrypt_ts_Change {  int amount;  Ripemd160 address;}
+
+contract MarketTimeBuyCovenant {
+  const int timeout;
+  const bytes sizeOrder;
+  const int priceOrder;
+  Ripemd160 oderMakerAdd;
+  @state PubKey oderTaker;
+  @state Ripemd160 oderTakerAdd;
+  @state ExchangeRate excangeRate;
+  @state int timeOutSetPrice;
+  @state int setPriceAgent;
+  @state bytes tokenSats;
+  @state bytes tokenScriptSize;
+  @state bytes tokenP2pkhScript;
+  @state bytes tokenData;
+  @state bool sold;
+  @state int price;
+  @state bytes toBuyerP2PKHScript;
+  bytes __scrypt_ts_ctx_hashoutputs;
+  int __scrypt_ts_ctx_locktime;
+  int __scrypt_ts_ctx_value;
+  __scrypt_ts_Change __scrypt_ts_change;
+  constructor(Ripemd160 oderTakerAdd, Ripemd160 oderMakerAdd, PubKey oderTaker, int timeout, int priceOrder, bytes sizeOrder, bool sold) {
+    this.tokenSats = b'';
+    this.tokenScriptSize = b'';
+    this.tokenP2pkhScript = b'';
+    this.tokenData = b'';
+    this.price = 0;
+    this.oderTaker = oderTaker;
+    this.oderTakerAdd = oderTakerAdd;
+    this.oderMakerAdd = oderMakerAdd;
+    this.sold = sold;
+    this.timeout = timeout;
+    this.priceOrder = priceOrder;
+    this.sizeOrder = sizeOrder;
+    this.setPriceAgent = 0;
+    this.excangeRate = {0, 0, b''};
+    this.timeOutSetPrice = 1000000000000;
+    this.toBuyerP2PKHScript = b'';
+  }
+  public function finish(Sig sig, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.sold == false);
+    require(hash160(pubkey) == this.oderMakerAdd);
+    require(checkSig(sig, pubkey));
+    bytes outputs = b'';
+    outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(hash160(this.oderMakerAdd)), this.__scrypt_ts_ctx_value);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function priceAtSetTime(Sig sig, PubKey pubkey, ExchangeRate rate, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.sold == false);
+    require(this.__scrypt_ts_ctx_locktime >= this.timeout);
+    require((hash160(pubkey) == this.oderMakerAdd) || (hash160(pubkey) == this.oderTakerAdd));
+    if((hash160(pubkey) == this.oderMakerAdd)) {
+        require(this.setPriceAgent == 0 || this.setPriceAgent == 2);
+        this.setPriceAgent = 1;
+        require(checkSig(sig, pubkey));
+      } else {
+        require(this.setPriceAgent == 0 || this.setPriceAgent == 1);
+        this.setPriceAgent = 2;
+        require(checkSig(sig, pubkey));
+      }
+    this.timeOutSetPrice = this.__scrypt_ts_ctx_locktime + 4;
+    this.excangeRate = rate;
+    bytes outputs = b'';
+    outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function execute(Sig sig, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.sold == false);
+    require(this.__scrypt_ts_ctx_locktime >= this.timeout);
+    if(this.__scrypt_ts_ctx_locktime < this.timeOutSetPrice) {
+        if((hash160(pubkey) == this.oderMakerAdd)) {
+          require(this.setPriceAgent == 2);
+        } else {
+          require(this.setPriceAgent == 1);
+        }
+        require(checkSig(sig, pubkey));
+      }
+    bytes outputs = b'';
+    int amountMaker = 0;
+    int amountTaker = this.__scrypt_ts_ctx_value;
+    outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.oderTakerAdd), amountTaker);
+    if(this.excangeRate.price > this.priceOrder) {
+        amountMaker = (this.__scrypt_ts_ctx_value * (this.excangeRate.price - this.priceOrder)) / this.excangeRate.price;
+        amountTaker = (this.__scrypt_ts_ctx_value - amountTaker);
+        outputs = Utils.buildOutput(Utils.buildPublicKeyHashScript(this.oderMakerAdd), amountMaker);
+        outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(this.oderTakerAdd), amountTaker);
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function sellOrder(Sig sig, PubKey seller, bool sell, int price, bytes toBuyerP2PKHScript, bytes outSats, bytes outOutScriptSize, bytes outP2pkHScript, bytes outData, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require((this.sold || sell) && !(this.sold && sell));
+    if(sell) {
+        this.oderTaker = seller;
+        require(checkSig(sig, this.oderTaker));
+      } else {
+        require(checkSig(sig, this.oderTaker));
+      }
+    bytes outputs = b'';
+    this.sold = sell;
+    if(sell) {
+        this.price = price;
+        this.toBuyerP2PKHScript = toBuyerP2PKHScript;
+        this.tokenSats = outSats;
+        this.tokenScriptSize = outOutScriptSize;
+        this.tokenP2pkhScript = outP2pkHScript;
+        this.tokenData = outData;
+        outputs = this.buildStateOutput(this.__scrypt_ts_ctx_value);
+      } else {
+        this.price = 0;
+        outputs = this.tokenSats + this.tokenScriptSize + this.tokenP2pkhScript + this.tokenData;
+      }
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  public function buying(bytes newOwnerAddScript, int price, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_ctx_hashoutputs = SigHash.hashOutputs(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_locktime = SigHash.nLocktime(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_ctx_value = SigHash.value(__scrypt_ts_txPreimage);
+    this.__scrypt_ts_change = {__scrypt_ts_changeAmount, __scrypt_ts_changeAddress};
+    require(this.sold);
+    require(price >= this.price);
+    require(newOwnerAddScript != this.tokenP2pkhScript);
+    if(this.toBuyerP2PKHScript != b'') {
+        require(newOwnerAddScript == this.toBuyerP2PKHScript);
+      }
+    bytes outputs = b'';
+    PubKey lastAlice = this.oderTaker;
+    this.sold = false;
+    this.price = 0;
+    outputs = this.tokenSats + this.tokenScriptSize + newOwnerAddScript + this.tokenData;
+    outputs += Utils.buildOutput(Utils.buildPublicKeyHashScript(hash160(lastAlice)), price);
+    if(this.__scrypt_ts_change.amount > 0) {
+        outputs += this.buildChangeOutput();
+      }
+    require(this.__scrypt_ts_ctx_hashoutputs == hash256(outputs));
+  }
+  function buildStateOutput(int amount) : bytes {  return Utils.buildOutput(this.getStateScript(), amount);}
+  function buildChangeOutput() : bytes {  return this.__scrypt_ts_change.amount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(this.__scrypt_ts_change.address), this.__scrypt_ts_change.amount) : b'';}
+}
